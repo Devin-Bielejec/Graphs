@@ -13,14 +13,16 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        self.vertices[f"{vertex_id}"] = set()
-        
+        if str(vertex_id) not in self.vertices:
+            self.vertices[f"{vertex_id}"] = set()
+        else:
+            print("Vertex already in there!")
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        if str(v1) not in self.vertices or str(v2) not in self.vertices:
+        if str(v1) not in self.vertices:
             print("Vertex does not exist")
         else:
             self.vertices[str(v1)].add(v2)
@@ -33,6 +35,7 @@ class Graph:
         if str(vertex_id) in self.vertices:
             for node in self.vertices[str(vertex_id)]:
                 neighbors.append(node)
+            return neighbors
         else:
             return []
 
@@ -41,7 +44,22 @@ class Graph:
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        hash = {}
+        q = Queue()
+        q.enqueue(starting_vertex)
+        path = ""
+        while q.size() > 0:
+            current_value = q.dequeue()
+
+            #add to hash
+            if str(current_value) not in hash:
+                path += f"{current_value}, "
+                hash[str(current_value)] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    q.enqueue(neighbor)
+        print(path[:-2])
 
     def dft(self, starting_vertex):
         """
