@@ -175,26 +175,27 @@ class Graph:
         This should be done using recursion.
         """
         hash = {}
-        s = Stack()
-        s.push({"value": starting_vertex, "previous_items": []})
-        while s.size() > 0:
-            current_item = s.pop()
-            current_value = current_item["value"]
-            current_previous_items = current_item["previous_items"]
+        results = None
+        def helper(self, current_vertex, destination_vertex):
+            nonlocal results
+            if current_vertex["value"] == destination_vertex:
+                results = current_vertex["previous_items"] + [current_vertex["value"]]
             
-            #if current value is destination vertex, print out all previous items and current, then break
-            if current_value == destination_vertex:
-                return current_previous_items + [current_value]
-            #add to hash
-            if str(current_value) not in hash:
-                hash[str(current_value)] = True
+            hash[f"{current_vertex['value']}"] = True
 
-                #Add neighbors
-                for neighbor in self.get_neighbors(current_value):
-                    s.push({"value": neighbor, "previous_items": current_previous_items + [current_value]})
-
-        return []
-
+            #Find all unvisited neighbors
+            unvisited_neighbors = [neighbor for neighbor in self.get_neighbors(current_vertex["value"]) if str(neighbor) not in hash]
+            
+            #Base Case - no unvisited neighbors
+            if len(unvisited_neighbors) == 0:
+                return
+            else:
+                #loop through unvisited neighbors and call helper
+                for uvn in unvisited_neighbors:
+                    helper(self, {'value': uvn, 'previous_items': current_vertex['previous_items'] + [current_vertex['value']]}, destination_vertex)
+            
+        helper(self, {"value": starting_vertex, "previous_items": []}, destination_vertex)
+        return results
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
     # https://github.com/LambdaSchool/Graphs/blob/master/objectives/breadth-first-search/img/bfs-visit-order.png
