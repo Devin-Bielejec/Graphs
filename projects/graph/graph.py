@@ -118,7 +118,27 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        hash = {}
+        q = Queue()
+        q.enqueue({"value": starting_vertex, "previous_items": []})
+        path = ""
+        while q.size() > 0:
+            current_item = q.dequeue()
+            current_value = current_item["value"]
+            current_previous_items = current_item["previous_items"]
+            
+            #if current value is destination vertex, print out all previous items and current, then break
+            if current_value == destination_vertex:
+                return current_previous_items + [current_value]
+            #add to hash
+            if str(current_value) not in hash:
+                hash[str(current_value)] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    q.enqueue({"value": neighbor, "previous_items": current_previous_items + [current_value]})
+
+        return []
 
     def dfs(self, starting_vertex, destination_vertex):
         """
