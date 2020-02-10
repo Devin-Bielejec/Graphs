@@ -121,7 +121,6 @@ class Graph:
         hash = {}
         q = Queue()
         q.enqueue({"value": starting_vertex, "previous_items": []})
-        path = ""
         while q.size() > 0:
             current_item = q.dequeue()
             current_value = current_item["value"]
@@ -146,9 +145,28 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        hash = {}
+        s = Stack()
+        s.push({"value": starting_vertex, "previous_items": []})
+        while s.size() > 0:
+            current_item = s.pop()
+            current_value = current_item["value"]
+            current_previous_items = current_item["previous_items"]
+            
+            #if current value is destination vertex, print out all previous items and current, then break
+            if current_value == destination_vertex:
+                return current_previous_items + [current_value]
+            #add to hash
+            if str(current_value) not in hash:
+                hash[str(current_value)] = True
 
-    def dfs_recursive(self, starting_vertex):
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    s.push({"value": neighbor, "previous_items": current_previous_items + [current_value]})
+
+        return []
+
+    def dfs_recursive(self, starting_vertex, destination_vertex):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -156,7 +174,26 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        hash = {}
+        s = Stack()
+        s.push({"value": starting_vertex, "previous_items": []})
+        while s.size() > 0:
+            current_item = s.pop()
+            current_value = current_item["value"]
+            current_previous_items = current_item["previous_items"]
+            
+            #if current value is destination vertex, print out all previous items and current, then break
+            if current_value == destination_vertex:
+                return current_previous_items + [current_value]
+            #add to hash
+            if str(current_value) not in hash:
+                hash[str(current_value)] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    s.push({"value": neighbor, "previous_items": current_previous_items + [current_value]})
+
+        return []
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
