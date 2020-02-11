@@ -71,7 +71,7 @@ class SocialGraph:
 
         random.shuffle(friendship_pairs)
         #we need 10 pairs, ie 20 relationships
-        count = 10
+        count = total_friends//2
         for friendship_pair in friendship_pairs:
             if count == 0:
                 break
@@ -133,14 +133,73 @@ class SocialGraph:
         """
         social_paths = {}
 
-        for num in range(1, len(self.users)+1):
+        for num in self.users.keys():
             if len(self.bfs(user_id, num)) > 0:
                 social_paths[num] = self.bfs(user_id, num)
         return social_paths
 
+    def get_percentage_of_other_users(self, starting_vertex):
+        """
+        Start with the starting_vertex as the given user
+        count every node in the graph
+
+        we want percentage of other users that are not the user or first friends
+
+        current user: 1
+        friends: X
+
+        total node - 1 - x = other users
+
+        other users / total
+        """
+        hash = {}
+        q = Queue()
+        q.enqueue(starting_vertex)
+        count = 0
+        while q.size() > 0:
+            current_value = q.dequeue()
+
+            #add to hash
+            if current_value not in hash:
+                count += 1
+                hash[current_value] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    q.enqueue(neighbor)
+        
+        #self.friendships is dictionary with user_id: {3, 4, 2}
+        #len(of that) will give us the length
+        other_users = count - 1 - len(self.friendships[starting_vertex])
+
+        #other users divided by all users in junk
+        return round(other_users/len(self.users)*100,10)
+
+    def degree_of_separation(self, starting_vertex):
+        hash = {}
+        q = Queue()
+        q.enqueue({"value": starting_vertex, "depth": 0})
+        other_users = 0
+        total_depth = 0
+        while q.size() > 0:
+            current = q.dequeue()
+
+            #add to hash
+            if current["value"] not in hash:
+                other_users += 1
+                total_depth += current["depth"]
+                hash[current["value"]] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current["value"]):
+                    q.enqueue({"value": neighbor, "depth": current["depth"] + 1})
+        
+        return round(total_depth/other_users,2)
+
+
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
+    sg.populate_graph(10000, 10)
     print(sg.friendships)
     connections = sg.get_all_social_paths(1)
-    print(connections)
+    print(sg.degree_of_separation(1))

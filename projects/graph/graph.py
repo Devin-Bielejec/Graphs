@@ -61,6 +61,33 @@ class Graph:
                     q.enqueue(neighbor)
         print(path[:-2])
 
+    def bfs(self, starting_vertex, destination_vertex):
+        """
+        Return a list containing the shortest path from
+        starting_vertex to destination_vertex in
+        breath-first order.
+        """
+        hash = {}
+        q = Queue()
+        q.enqueue({"value": starting_vertex, "previous_items": []})
+        while q.size() > 0:
+            current_item = q.dequeue()
+            current_value = current_item["value"]
+            current_previous_items = current_item["previous_items"]
+            
+            #if current value is destination vertex, print out all previous items and current, then break
+            if current_value == destination_vertex:
+                return current_previous_items + [current_value]
+            #add to hash
+            if str(current_value) not in hash:
+                hash[str(current_value)] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    q.enqueue({"value": neighbor, "previous_items": current_previous_items + [current_value]})
+
+        return []    
+
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
