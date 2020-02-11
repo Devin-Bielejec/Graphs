@@ -1,5 +1,16 @@
 import random
-
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
 class User:
     def __init__(self, name):
         self.name = name
@@ -68,6 +79,44 @@ class SocialGraph:
                 self.add_friendship(friendship_pair[0], friendship_pair[1])
                 count -= 1
 
+    def get_neighbors(self, vertex_id):
+        """
+        Get all neighbors (edges) of a vertex.
+        """
+        neighbors = []
+        if vertex_id in self.friendships:
+            for node in self.friendships[vertex_id]:
+                neighbors.append(node)
+            return neighbors
+        else:
+            return []
+
+    def bfs(self, starting_vertex, destination_vertex):
+        """
+        Return a list containing the shortest path from
+        starting_vertex to destination_vertex in
+        breath-first order.
+        """
+        hash = {}
+        q = Queue()
+        q.enqueue({"value": starting_vertex, "previous_items": []})
+        while q.size() > 0:
+            current_item = q.dequeue()
+            current_value = current_item["value"]
+            current_previous_items = current_item["previous_items"]
+            
+            #if current value is destination vertex, print out all previous items and current, then break
+            if current_value == destination_vertex:
+                return current_previous_items + [current_value]
+            #add to hash
+            if current_value not in hash:
+                hash[current_value] = True
+
+                #Add neighbors
+                for neighbor in self.get_neighbors(current_value):
+                    q.enqueue({"value": neighbor, "previous_items": current_previous_items + [current_value]})
+
+        return []
 
     def get_all_social_paths(self, user_id):
         """
@@ -77,11 +126,17 @@ class SocialGraph:
         extended network with the shortest friendship path between them.
 
         The key is the friend's ID and the value is the path.
-        """
-        visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
-        return visited
 
+        {1: {8, 10, 5}, 2: {10, 5, 7}, 3: {4}, 4: {9, 3}, 5: {8, 1, 2}, 6: {10}, 7: {2}, 8: {1, 5}, 9: {4}, 10: {1, 2, 6}}
+
+        {1: [1], 8: [1, 8], 10: [1, 10], 5: [1, 5], 2: [1, 10, 2], 6: [1, 10, 6], 7: [1, 10, 2, 7]}
+        """
+        social_paths = {}
+
+        for num in range(1, len(self.users)+1):
+            if len(self.bfs(user_id, num)) > 0:
+                social_paths[num] = self.bfs(user_id, num)
+        return social_paths
 
 if __name__ == '__main__':
     sg = SocialGraph()
